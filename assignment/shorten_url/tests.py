@@ -1,6 +1,6 @@
 import pytest
 from django.urls import reverse
-from pytest_django.asserts import assertRedirects
+from pytest_django.asserts import assertContains, assertRedirects
 
 from .models import Record, from_char_to_pk, from_pk_to_char
 
@@ -36,3 +36,12 @@ def test_redirect(client):
     record.save()
     response = client.get(reverse('redirect', kwargs={'code': record.to_chars()}))
     assertRedirects(response, test_url, fetch_redirect_response=False)
+
+
+@pytest.mark.django_db
+def test_preview(client):
+    test_url = 'http://test.io'
+    record = Record(URL=test_url)
+    record.save()
+    response = client.get(reverse('preview', kwargs={'code': record.to_chars()}))
+    assertContains(response, test_url)
