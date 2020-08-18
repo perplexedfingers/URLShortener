@@ -1,6 +1,8 @@
 import pytest
+from django.urls import reverse
+from pytest_django.asserts import assertRedirects
 
-from .models import from_char_to_pk, from_pk_to_char
+from .models import Record, from_char_to_pk, from_pk_to_char
 
 
 def test_char_to_int():
@@ -25,3 +27,12 @@ def test_int_to_char():
         from_pk_to_char(10 ** 8)
     with pytest.raises(TypeError):
         from_pk_to_char('AAAAA')
+
+
+@pytest.mark.django_db
+def test_redirect(client):
+    test_url = 'http://test.io'
+    record = Record(URL=test_url)
+    record.save()
+    response = client.get(reverse('redirect', kwargs={'code': record.to_chars()}))
+    assertRedirects(response, test_url, fetch_redirect_response=False)
