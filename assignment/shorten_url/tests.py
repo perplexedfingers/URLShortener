@@ -29,19 +29,33 @@ def test_int_to_char():
         from_pk_to_char('AAAAA')
 
 
+def create_record(url):
+    record = Record(url=url)
+    record.save()
+    record.path_name = from_pk_to_char(record.pk)
+    record.save()
+    return record
+
+
 @pytest.mark.django_db
 def test_redirect(client):
     test_url = 'http://test.io'
-    record = Record(URL=test_url)
-    record.save()
-    response = client.get(reverse('redirect', kwargs={'code': record.to_chars()}))
+    record = create_record(test_url)
+    response = client.get(reverse('redirect'), {'path_name': record.path_name})
     assertRedirects(response, test_url, fetch_redirect_response=False)
 
 
 @pytest.mark.django_db
 def test_preview(client):
     test_url = 'http://test.io'
-    record = Record(URL=test_url)
-    record.save()
-    response = client.get(reverse('preview', kwargs={'code': record.to_chars()}))
+    record = create_record(test_url)
+    response = client.get(reverse('preview'), {'path_name': record.path_name})
     assertContains(response, test_url)
+
+
+@pytest.mark.django_db
+def test_create(client):
+    test_url = 'http://test.io'
+    response = client.post(reverse('create'), {'url': test_url})
+    path_name = response.content.decode('utf-8')
+    assert Record.objects.get(path_name=path_name)

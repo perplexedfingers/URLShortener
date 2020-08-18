@@ -25,7 +25,5 @@ def from_pk_to_char(pk):
 
 
 class Record(models.Model):
-    URL = models.URLField(unique=True)
-
-    def to_chars(self):
-        return from_pk_to_char(self.pk)
+    url = models.URLField(unique=True)
+    path_name = models.CharField(max_length=5, null=True)
