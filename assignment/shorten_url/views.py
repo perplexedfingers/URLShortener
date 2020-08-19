@@ -1,3 +1,4 @@
+from django.core.exceptions import ValidationError
 from django.db import transaction
 from django.shortcuts import redirect, render
 from django.utils.translation import gettext_lazy as _
@@ -21,18 +22,18 @@ def convert(request):
         path_name = form.cleaned_data['path_name']
         url = Record.objects.get(path_name=path_name).url
     except Record.DoesNotExist:
-        form.add_error('path_name', _(f'{path_name} coverts to nothing'))
+        form.add_error('path_name', ValidationError(_('%(path_name)s converts to nothing'),
+                                                    params={'path_name': path_name}, code='invalid'))
     except KeyError:
-        # When the path is illeagl, it is not in cleaned_data
+        # When the path is illegal, it is not in cleaned_data
         pass
 
     is_preview = form.cleaned_data['is_preview']
 
     if form.errors:
-        return render(request, 'index.html', {'query_form': form.as_table(), 'create_form': CreateForm()})
+        return render(request, 'index.html', {'query_form': form, 'create_form': CreateForm()})
     elif is_preview:
-        return render(request, 'index.html', {'query_form': form.as_table(), 'create_form': CreateForm(),
-                                              'url': url})
+        return render(request, 'index.html', {'query_form': form, 'create_form': CreateForm(), 'url': url})
     else:
         return redirect(url)
 
@@ -43,13 +44,12 @@ def create(request):
     if form.is_valid():
         url = form.cleaned_data['url']
         with transaction.atomic():
-            record, is_created = Record.objects.get_or_create(url=url)
-            if is_created:
+            record, record_is_new = Record.objects.get_or_create(url=url)
+            if record_is_new:
                 record.path_name = from_pk_to_char(record.pk)
                 record.save()
         return render(request, 'index.html',
-                      {'query_form': QueryForm({'path_name': record.path_name}).as_table(),
-                       'create_form': CreateForm(),
+                      {'query_form': QueryForm({'path_name': record.path_name}), 'create_form': CreateForm(),
                        'path_name': record.path_name})
     else:
-        return render(request, 'index.html', {'query_form': QueryForm(), 'create_form': form.as_table()})
+        return render(request, 'index.html', {'query_form': QueryForm(), 'create_form': form})
