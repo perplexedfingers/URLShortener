@@ -3,20 +3,7 @@ from django.urls import reverse
 from pytest_django.asserts import (assertContains, assertFormError,
                                    assertRedirects)
 
-from .models import Record, from_char_to_pk, from_pk_to_char
-
-
-def test_char_to_int():
-    assert from_char_to_pk('AAAAB') == 1
-    assert from_char_to_pk('AAABB') == 27
-    assert from_char_to_pk('ZZZZZ') == 11881375
-
-    with pytest.raises(ValueError):
-        from_char_to_pk('ASDW')
-    with pytest.raises(KeyError):
-        from_char_to_pk('aaaab')
-    with pytest.raises(TypeError):
-        from_char_to_pk(123)
+from .models import Record, from_pk_to_char
 
 
 def test_int_to_char():

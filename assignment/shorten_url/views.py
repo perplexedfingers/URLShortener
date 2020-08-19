@@ -24,8 +24,7 @@ def convert(request):
     except Record.DoesNotExist:
         form.add_error('path_name', ValidationError(_('%(path_name)s converts to nothing'),
                                                     params={'path_name': path_name}, code='invalid'))
-    except KeyError:
-        # When the path is illegal, it is not in cleaned_data
+    except KeyError:  # When the path is illegal, it is not in cleaned_data
         pass
 
     is_preview = form.cleaned_data['is_preview']
