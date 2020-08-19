@@ -13,6 +13,7 @@ def validate_uppercase_only(value):
 class QueryForm(forms.Form):
     path_name = forms.CharField(label='Path name', max_length=5, min_length=5,
                                 validators=[validate_uppercase_only])
+    redirect_or_preview = forms.BooleanField(label='Select to preview. Deselect to redirect', required=False)
 
 
 class CreateForm(forms.Form):

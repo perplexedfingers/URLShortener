@@ -41,7 +41,7 @@ def create_record(url):
 def test_redirect(client):
     test_url = 'http://test.io'
     record = create_record(test_url)
-    response = client.get(reverse('redirect'), {'path_name': record.path_name})
+    response = client.get(reverse('convert'), {'path_name': record.path_name, 'redirect_or_preview': True})
     assertRedirects(response, test_url, fetch_redirect_response=False)
 
 
@@ -49,7 +49,7 @@ def test_redirect(client):
 def test_preview(client):
     test_url = 'http://test.io'
     record = create_record(test_url)
-    response = client.get(reverse('preview'), {'path_name': record.path_name})
+    response = client.get(reverse('convert'), {'path_name': record.path_name, 'redirect_or_preview': False})
     assertContains(response, test_url)
 
 
