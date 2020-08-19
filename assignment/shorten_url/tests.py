@@ -7,12 +7,16 @@ from .models import Record, from_pk_to_char
 
 
 def test_int_to_char():
+    assert from_pk_to_char(0) == 'AAAAA'
     assert from_pk_to_char(1) == 'AAAAB'
     assert from_pk_to_char(27) == 'AAABB'
     assert from_pk_to_char(10 ** 7 + 1) == 'VWYXL'
+    assert from_pk_to_char(11881375) == 'ZZZZZ'
 
     with pytest.raises(KeyError):
         from_pk_to_char(10 ** 8)
+    with pytest.raises(KeyError):
+        from_pk_to_char(-1)
     with pytest.raises(TypeError):
         from_pk_to_char('AAAAA')
 
