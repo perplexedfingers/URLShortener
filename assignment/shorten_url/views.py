@@ -1,6 +1,7 @@
 from django.db import transaction
 from django.http import HttpResponse
-from django.shortcuts import redirect
+from django.shortcuts import redirect, render
+from django.utils.translation import gettext_lazy as _
 from django.views.decorators.http import require_GET, require_POST
 
 from .forms import CreateForm, QueryForm
@@ -8,16 +9,32 @@ from .models import Record, from_pk_to_char
 
 
 @require_GET
+def index(request):
+    return render(request, 'index.html', {'query_form': QueryForm(), 'create_form': CreateForm()})
+
+
+@require_GET
 def convert(request):
     form = QueryForm(request.GET)
-    if form.is_valid():
+    form.is_valid()
+
+    try:
         path_name = form.cleaned_data['path_name']
         url = Record.objects.get(path_name=path_name).url
-        is_redirect = form.cleaned_data['redirect_or_preview']
-        if is_redirect:
-            return redirect(url)
-        else:
-            return HttpResponse(url)
+    except Record.DoesNotExist:
+        form.add_error('path_name', _(f'{path_name} coverts to nothing'))
+    except KeyError:
+        # When the path is illeagl, it is not in cleaned_data
+        pass
+
+    is_preview = form.cleaned_data['redirect_or_preview']
+
+    if form.errors:
+        return render(request, 'index.html', {'query_form': form.as_table(), 'create_form': CreateForm()})
+    elif is_preview:
+        return HttpResponse(url)
+    else:
+        return redirect(url)
 
 
 @require_POST

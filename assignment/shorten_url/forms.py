@@ -7,7 +7,7 @@ from django.utils.translation import gettext_lazy as _
 
 def validate_uppercase_only(value):
     if any((char not in ascii_uppercase for char in value)):
-        raise ValidationError(_('%(value) is illeagl'), params={'value': value},)
+        raise ValidationError(_('%(value)s is illegal'), params={'value': value}, code='invalid',)
 
 
 class QueryForm(forms.Form):
