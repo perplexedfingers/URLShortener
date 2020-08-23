@@ -7,13 +7,18 @@ Features
 - Convert an valid URL to a fixed length of URL
 
 
-- Can save more than 10,000,000 unique URLs
+  - The converted URL is consisted of uppercase alphebets only
+
+  - The converted URL is always 5 charecters long
+
+
+- Save more than 10,000,000 unique URLs
 
 
   - 11,881,374 URLs to be exact
 
 
-- Can preview or redirect to the converted URL
+- Preview or redirect to the converted URL
 
 
 Developemnt guide
@@ -47,6 +52,14 @@ Feature: Create path name from an URL
         And I click 'Create' button
 
         Then I can see the created path name
+
+    Scenario: Give the same path name when given the same valid URL
+        Given an valid URL is registered
+
+        When I input the URL
+        And I click 'Create' button
+
+        Then the path name should be the same
 
     Scenario: Notify users when the URL is invalid
         Given an invalid URL
@@ -117,3 +130,12 @@ Feature: Redirect to the URL of the path name
         And I click 'Convert' button
 
         Then I can see a message about this path name converts to nothing
+
+
+TODO
+------
+
+- Write ``setup.py`` and setup own pypi server to make it easy to update
+
+
+- Use ``daphne`` and make ``DEBUG`` to ``False`` when deploying

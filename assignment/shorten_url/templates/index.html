@@ -7,7 +7,7 @@
 {% if path_name %}
 The URL has converted to {{ path_name }} and also fill in the blank below.
 {% endif %}
-
+<hr>
 <form action="{% url 'convert' %}" method="get">
     {{ query_form }}
     <input type="submit" value="Convert">
